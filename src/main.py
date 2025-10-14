@@ -36,3 +36,8 @@ if __name__ == "__main__":
         "Text": ["Hello", "World!"]
     })
     assert df.shape == (2, 1)
+
+    if config["params"]["fail"]:
+        assert False
+    
+    logger.info("This script ran successfully!!")
