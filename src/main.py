@@ -1,4 +1,5 @@
 import logging
+import pandas as pd
 from datetime import datetime
 from config_handler import Config
 from secret_handler import Secrets
@@ -25,6 +26,13 @@ if __name__ == "__main__":
     if config["params"]["log_level"] == "DEBUG":
         logger.debug(f"This is a cloud run {config["params"]["cloud_run_type"]}")
         logger.debug(f"Current time: {log_time_now()}")
+    
     elif config.config["params"]["log_level"] == "INFO":
         logger.debug(f"This is a cloud run {config["params"]["cloud_run_type"]}")
         logger.info(f"Current time: {log_time_now()}")
+
+    # make a pandas dataframe
+    df = pd.DataFrame({
+        "Text": ["Hello", "World!"]
+    })
+    assert df.shape == (2, 1)
