@@ -1,0 +1,3 @@
+params:
+  cloud_run_type: job
+  log_level: info
