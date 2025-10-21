@@ -17,9 +17,9 @@ RUN pip install --user --no-cache-dir -r /cloud_run_playground/requirements.txt 
 
 # Copy over scripts
 COPY /src/*.py /cloud_run_playground/src/
+COPY /entrypoint.sh /entrypoint.sh
 
 ENV PYTHONPATH="/cloud_run_playground"
 ENV PYTHONPATH="/home/cloud_run_user/.local/lib/python3.13/site-packages:$PYTHONPATH"
 
-# run main script
-CMD ["python", "/cloud_run_playground/src/main.py"]
+ENTRYPOINT ["/entrypoint.sh"]
