@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 from datetime import datetime
+from sqlalchemy import URL, create_engine
 from config_handler import Config
 from secret_handler import Secrets
 
@@ -15,6 +16,18 @@ def log_time_now():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def create_conn_url(secrets: dict):
+
+    return URL.create(
+        "mysql+mysqlconnector",
+        username=secrets["user"],
+        password=secrets["password"],
+        host=secrets["host"],
+        port=secrets["port"],
+        database=secrets["database"],
+    )
+
+
 if __name__ == "__main__":
 
     config = Config("configs/config.yaml").config
@@ -23,21 +36,28 @@ if __name__ == "__main__":
     print("Read config file:", config)
     print("Read secrets file:", secrets.get_redacted_secrets(secrets.secrets))
 
+    conn_url = create_conn_url(secrets.secrets["mysql"])
+    logger.info(f"Database connection URL: {str(conn_url)}")
+    engine = create_engine(conn_url)
+    table = config["params"]["table"]
+    with engine.connect() as connection:
+        df = pd.read_sql(table, connection)
+    logger.info(f"Selected {table} into pd.DataFrame")
+    logger.info(f"Selected columns: {", ".join(list(df.columns))}")
+
     if config["params"]["log_level"] == "DEBUG":
         logger.debug(f"This is a cloud run {config["params"]["cloud_run_type"]}")
         logger.debug(f"Current time: {log_time_now()}")
-    
+
     elif config.config["params"]["log_level"] == "INFO":
         logger.debug(f"This is a cloud run {config["params"]["cloud_run_type"]}")
         logger.info(f"Current time: {log_time_now()}")
 
     # make a pandas dataframe
-    df = pd.DataFrame({
-        "Text": ["Hello", "World!"]
-    })
+    df = pd.DataFrame({"Text": ["Hello", "World!"]})
     assert df.shape == (2, 1)
 
     if config["params"]["fail"]:
         assert False
-    
+
     logger.info("This script ran successfully!!")

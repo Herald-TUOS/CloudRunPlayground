@@ -15,7 +15,7 @@ class Secrets:
         return {
             key: (
                 "REDACTED"
-                if isinstance(secrets[key], str)
+                if not isinstance(secrets[key], dict)
                 else Secrets.get_redacted_secrets(secrets[key])
             )
             for key in secrets
