@@ -1,25 +1,25 @@
-FROM python:3.13-slim
+# Docker multi-stage build
 
-# Create a new user
-USER root
-RUN useradd -m -d /home/cloud_run_user -s /bin/bash -u 1001 cloud_run_user
-
-RUN pip install --upgrade pip
-
-# Switch user to newly created user
-USER cloud_run_user
-
-WORKDIR /cloud_run_playground
+# Stage 1
+FROM cgr.dev/chainguard/python:latest-dev as dev
+WORKDIR /install
 
 # Install all requirements
-COPY requirements.txt /cloud_run_playground
-RUN pip install --user --no-cache-dir -r /cloud_run_playground/requirements.txt > /dev/null
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt --target=/install
 
-# Copy over scripts
-COPY /src/*.py /cloud_run_playground/src/
-COPY /entrypoint.sh /entrypoint.sh
 
-ENV PYTHONPATH="/cloud_run_playground"
-ENV PYTHONPATH="/home/cloud_run_user/.local/lib/python3.13/site-packages:$PYTHONPATH"
+# Stage 2
+FROM cgr.dev/chainguard/python:latest
 
-ENTRYPOINT ["/entrypoint.sh"]
+# FROM python:3.13-slim AS runner
+WORKDIR /cloud_run_playground
+
+# Copy installed Python packages to the right place
+COPY --from=dev /install /install
+
+# Copy application code
+COPY /src/*.py ./src/
+
+ENV PYTHONPATH=/install
+ENTRYPOINT ["python3", "./src/main.py"]
