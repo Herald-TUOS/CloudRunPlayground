@@ -1,11 +1,11 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/pvlive/github.com/herald-tuos/cloudrunplayground:$SHORT_SHA', '.']
+    args: ['build', '-t', 'europe-west2-docker.pkg.dev/pvlive/sheffieldsolar/cloudrunplayground:$SHORT_SHA', '.']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/pvlive/github.com/herald-tuos/cloudrunplayground:$SHORT_SHA']
+    args: ['push', 'europe-west2-docker.pkg.dev/pvlive/sheffieldsolar/cloudrunplayground:$SHORT_SHA']
 
 options:
   logging: CLOUD_LOGGING_ONLY
 
 images:
-  - 'gcr.io/pvlive/github.com/herald-tuos/cloudrunplayground:$SHORT_SHA'
+  - 'europe-west2-docker.pkg.dev/pvlive/sheffieldsolar/cloudrunplayground:$SHORT_SHA'
